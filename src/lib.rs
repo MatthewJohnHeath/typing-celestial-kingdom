@@ -6,16 +6,19 @@ pub struct False();
 pub struct True();
 
 
-pub trait Deny{
-    type Bang;
+pub trait TypeBool{
+    type Not;
+    const VALUE: bool;
 }
 
-impl Deny for False {
-    type Bang = True;
+impl TypeBool for False {
+    type Not = True;
+    const VALUE: bool = false;
 }
 
-impl Deny for  True {
-    type Bang = False;
+impl TypeBool for  True {
+    type Not = False;
+    const VALUE: bool = true;
 }
 
 
@@ -23,17 +26,9 @@ impl Deny for  True {
 mod tests {
     use super::*;
     #[test]
-    fn not_false_is_true() {
-        let factual = True::default();
-        let not_false = <False as Deny>::Bang::default();
-        assert_eq!(factual, not_false);
-    }
-
-    #[test]
-    fn not_true_is_false() {
-        let fake = False::default();
-        let untrue = <True as Deny>::Bang::default();
-        assert_eq!(fake, untrue);
+    fn not() {
+        assert!(<False as TypeBool>::Not::VALUE);
+        assert!(!<True as TypeBool>::Not::VALUE);
     }
 }
 
