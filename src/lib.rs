@@ -201,8 +201,13 @@ impl<F, S> Associated  for ChoiceType<false, F, S>{
     type AssociatedType =  S;
 }
 
-pub const fn same( first : &[u8;2], second : &[u8;2])->bool{
-    first[0] == second[0] && first[1] == second[1]
+pub const fn same<const N: usize>( first : &[u8;N], second : &[u8;N])->bool{
+    let mut i:usize = 0;
+    while i < N{
+        if first[i] != second[i] {return false};
+        i = i + 1;
+    }
+    true
 }
 
 #[cfg(test)]
