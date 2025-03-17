@@ -105,6 +105,8 @@ impl<T:TypeInt> TypeInt for Negative<T>
         type Negation = T;
         const VALUE:i64 = -T::VALUE;
     }
+
+#[cfg(test)]
 mod type_int_tests {
      use super::*;
      type One = Succ<Zero>;
@@ -164,6 +166,7 @@ where <S as TypeInt>::Negation: TypeInt,
         type Sum = <<TypePair<T, <S as TypeInt>::Negation> as Add>::Sum as TypeInt>::Negation;
     }
 
+ #[cfg(test)]
 mod artihmetic_tests {
     use super::*;
     type One = Succ<Zero>;
