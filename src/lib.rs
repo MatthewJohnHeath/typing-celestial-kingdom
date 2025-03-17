@@ -21,14 +21,53 @@ impl TypeBool for  True {
     const VALUE: bool = true;
 }
 
+pub struct TypePair<T,S>(PhantomData<T>, PhantomData<S>);
+
+trait And{
+    type BoolType;
+}
+
+impl<T> And for TypePair<True, T>{
+    type BoolType = T;
+}
+
+impl<T> And for TypePair<False, T>{
+    type BoolType = False;
+}
+
+trait Or{
+    type BoolType;
+}
+
+impl<T> Or for TypePair<True, T>{
+    type BoolType = True;
+}
+
+impl<T> Or for TypePair<False, T>{
+    type BoolType = T;
+}
 
 #[cfg(test)]
-mod tests {
+mod logic_tests {
     use super::*;
     #[test]
     fn not() {
         assert!(<False as TypeBool>::Not::VALUE);
         assert!(!<True as TypeBool>::Not::VALUE);
+    }
+    #[test]
+    fn and(){
+        assert!(<TypePair<True, True> as And>::BoolType::VALUE);
+        assert!(!<TypePair<False, True> as And>::BoolType::VALUE);
+        assert!(!<TypePair<True, False> as And>::BoolType::VALUE);
+        assert!(!<TypePair<False, False> as And>::BoolType::VALUE);
+    }
+    #[test]
+    fn or(){
+        assert!(<TypePair<True, True> as Or>::BoolType::VALUE);
+        assert!(<TypePair<False, True> as Or>::BoolType::VALUE);
+        assert!(<TypePair<True, False> as Or>::BoolType::VALUE);
+        assert!(!<TypePair<False, False> as And>::BoolType::VALUE);
     }
 }
 
