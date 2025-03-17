@@ -201,13 +201,14 @@ impl<F, S> Associated  for ChoiceType<false, F, S>{
     type AssociatedType =  S;
 }
 
-pub const fn same<const N: usize>( first : &[u8;N], second : &[u8;N])->bool{
-    let mut i:usize = 0;
-    while i < N{
-        if first[i] != second[i] {return false};
+pub const fn before(first : &str, second  : &str)-> bool{
+    let mut i = 0;
+    let n = if first.len() <second.len() {first.len()} else {second.len()};
+    while i < n{
+        if first.as_bytes()[i] < second.as_bytes()[i]{ return true;}
         i = i + 1;
     }
-    true
+    return first.len() < second.len();
 }
 
 #[cfg(test)]
@@ -225,15 +226,9 @@ mod choice_type_tests {
         assert!(!<ChoiceType< {1>2}, True, False> as Associated>::AssociatedType::VALUE);
     }
 
-    const AA:[u8;2] = [b'a', b'a'];
-    const AB:[u8;2] = [b'a', b'b'];
-
     #[test]
-    fn with_same(){
-        assert!(<ChoiceType< {same(&AA, &AA)}, True, False> as Associated>::AssociatedType::VALUE);
-        assert!(!<ChoiceType< {same(&AA, &AB)}, True, False> as Associated>::AssociatedType::VALUE);
-        
+    fn with_before(){
+        assert!(<ChoiceType< {before("Hello", "World!")}, True, False> as Associated>::AssociatedType::VALUE);
+        assert!(!<ChoiceType< {before("Bye", "Bye")}, True, False> as Associated>::AssociatedType::VALUE);        
     }
 }
-
-
