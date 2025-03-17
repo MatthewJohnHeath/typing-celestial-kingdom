@@ -5,9 +5,8 @@ pub struct False();
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct True();
 
-
 pub trait TypeBool{
-    type Not;
+    type Not : TypeBool;
     const VALUE: bool;
 }
 
@@ -24,26 +23,26 @@ impl TypeBool for  True {
 pub struct TypePair<T,S>(PhantomData<T>, PhantomData<S>);
 
 trait And{
-    type BoolType;
+    type BoolType : TypeBool;
 }
 
-impl<T> And for TypePair<True, T>{
+impl<T:TypeBool> And for TypePair<True, T>{
     type BoolType = T;
 }
 
-impl<T> And for TypePair<False, T>{
+impl<T:TypeBool> And for TypePair<False, T>{
     type BoolType = False;
 }
 
 trait Or{
-    type BoolType;
+    type BoolType : TypeBool;
 }
 
 impl<T> Or for TypePair<True, T>{
     type BoolType = True;
 }
 
-impl<T> Or for TypePair<False, T>{
+impl<T : TypeBool> Or for TypePair<False, T>{
     type BoolType = T;
 }
 
