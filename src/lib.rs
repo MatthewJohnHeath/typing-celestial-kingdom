@@ -201,6 +201,9 @@ impl<F, S> Associated  for ChoiceType<false, F, S>{
     type AssociatedType =  S;
 }
 
+pub const fn same( first : &[u8;2], second : &[u8;2])->bool{
+    first[0] == second[0] && first[1] == second[1]
+}
 
 #[cfg(test)]
 mod choice_type_tests {
@@ -215,6 +218,16 @@ mod choice_type_tests {
     fn with_expression(){
         assert!(<ChoiceType< {1<2}, True, False> as Associated>::AssociatedType::VALUE);
         assert!(!<ChoiceType< {1>2}, True, False> as Associated>::AssociatedType::VALUE);
+    }
+
+    const AA:[u8;2] = [b'a', b'a'];
+    const AB:[u8;2] = [b'a', b'b'];
+
+    #[test]
+    fn with_same(){
+        assert!(<ChoiceType< {same(&AA, &AA)}, True, False> as Associated>::AssociatedType::VALUE);
+        assert!(!<ChoiceType< {same(&AA, &AB)}, True, False> as Associated>::AssociatedType::VALUE);
+        
     }
 }
 
