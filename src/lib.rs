@@ -69,17 +69,29 @@ impl<T:TypeInt> TypeInt for Succ<T>
 
 impl<T:TypeInt> TypeInt for Negative<T> 
     {
-        type Previous = T::Next;
-        type Next = T::Previous;
+        type Previous = Negative<T::Next>;
+        type Next = Negative<T::Previous>;
         const VALUE:i64 = -T::VALUE;
     }
-mod more_tests {
+mod type_int_tests {
      use super::*;
+     type One = Succ<Zero>;
+     type Two = Succ<One>;
+     type MinusOne = Negative<One>;
     #[test]
     fn values() {
         assert_eq!(Zero::VALUE, 0);
-        assert_eq!(Succ::<Zero>::VALUE, 1);
-        assert_eq!(Succ::<Succ<Zero>>::VALUE, 2);
-        assert_eq!(Negative::<Succ<Zero>>::VALUE, -1);
+        assert_eq!(One::VALUE, 1);
+        assert_eq!(Two::VALUE, 2);
+        assert_eq!(MinusOne::VALUE, -1);
+    }
+
+    type MinusTwo = Negative<Two>;
+   #[test]
+    fn nexts(){
+        assert_eq!(<Zero as TypeInt>::Next::VALUE, 1);
+        assert_eq!(<One as TypeInt>::Next::VALUE, 2);
+        assert_eq!(<MinusOne as TypeInt>::Next::VALUE, 0);
+        assert_eq!(<MinusTwo as TypeInt>::Next::VALUE, -1);
     }
 }
