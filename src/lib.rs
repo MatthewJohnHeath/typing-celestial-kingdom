@@ -77,9 +77,9 @@ pub struct Negative<T>(PhantomData<T>);
 
 
 pub trait TypeInt{
-    type Previous;
-    type Next;
-    type Negation;
+    type Previous : TypeInt;
+    type Next : TypeInt;
+    type Negation : TypeInt;
     const VALUE: i64;
 }
 
@@ -144,7 +144,7 @@ mod type_int_tests {
 }
 
 pub trait Add{
-    type Sum;
+    type Sum : TypeInt;
 }
 
 impl <T:TypeInt> Add for TypePair<Zero, T>{
