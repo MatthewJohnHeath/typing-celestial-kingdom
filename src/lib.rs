@@ -88,10 +88,18 @@ mod type_int_tests {
 
     type MinusTwo = Negative<Two>;
    #[test]
-    fn nexts(){
+    fn next(){
         assert_eq!(<Zero as TypeInt>::Next::VALUE, 1);
         assert_eq!(<One as TypeInt>::Next::VALUE, 2);
         assert_eq!(<MinusOne as TypeInt>::Next::VALUE, 0);
         assert_eq!(<MinusTwo as TypeInt>::Next::VALUE, -1);
+    }
+
+    #[test]
+    fn previous(){
+        assert_eq!(<Zero as TypeInt>::Previous::VALUE, -1);
+        assert_eq!(<One as TypeInt>::Previous::VALUE, 0);
+        assert_eq!(<Two as TypeInt>::Previous::VALUE, 1);
+        assert_eq!(<MinusOne as TypeInt>::Previous::VALUE, -2);
     }
 }
