@@ -186,3 +186,36 @@ mod artihmetic_tests {
         assert_eq!(<TypePair<MinusOne, MinusOne> as Add>::Sum::VALUE, -2);
     }
 }
+
+pub struct ChoiceType<const BOOL : bool, F, S>(PhantomData<F>, PhantomData<S>);
+
+pub trait Associated{
+    type AssociatedType;
+}
+
+impl<F, S> Associated  for ChoiceType<true, F, S>{
+    type AssociatedType =  F;
+}
+
+impl<F, S> Associated  for ChoiceType<false, F, S>{
+    type AssociatedType =  S;
+}
+
+
+#[cfg(test)]
+mod choice_type_tests {
+    use super::*;
+    #[test]
+    fn with_bool_literal(){
+        assert!(<ChoiceType<true, True, False> as Associated>::AssociatedType::VALUE);
+        assert!(!<ChoiceType<false, True, False> as Associated>::AssociatedType::VALUE);
+    }
+
+    #[test]
+    fn with_expression(){
+        assert!(<ChoiceType< {1<2}, True, False> as Associated>::AssociatedType::VALUE);
+        assert!(!<ChoiceType< {1>2}, True, False> as Associated>::AssociatedType::VALUE);
+    }
+}
+
+
