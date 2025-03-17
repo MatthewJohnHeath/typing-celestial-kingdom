@@ -80,12 +80,14 @@ pub struct Negative<T>(PhantomData<T>);
 pub trait TypeInt{
     type Previous;
     type Next;
+    type Negation;
     const VALUE: i64;
 }
 
 impl TypeInt for Zero{
     type Previous = Negative<Succ<Self>>;
     type Next = Succ<Self>;
+    type Negation = Self;
     const VALUE:i64 = 0;
 }
 
@@ -93,6 +95,7 @@ impl<T:TypeInt> TypeInt for Succ<T>
     {
         type Previous = T;
         type Next = Succ<Self>;
+        type Negation = Negative<Self>;
         const VALUE:i64 = T::VALUE + 1;
     }
 
@@ -100,6 +103,7 @@ impl<T:TypeInt> TypeInt for Negative<T>
     {
         type Previous = Negative<T::Next>;
         type Next = Negative<T::Previous>;
+        type Negation = T;
         const VALUE:i64 = -T::VALUE;
     }
 mod type_int_tests {
@@ -130,5 +134,53 @@ mod type_int_tests {
         assert_eq!(<One as TypeInt>::Previous::VALUE, 0);
         assert_eq!(<Two as TypeInt>::Previous::VALUE, 1);
         assert_eq!(<MinusOne as TypeInt>::Previous::VALUE, -2);
+    }
+
+    #[test]
+    fn negation(){
+        assert_eq!(<Zero as TypeInt>::Negation::VALUE, 0);
+        assert_eq!(<One as TypeInt>::Negation::VALUE, -1);
+        assert_eq!(<MinusOne as TypeInt>::Negation::VALUE, 1);
+    }
+}
+
+pub trait Add{
+    type Sum;
+}
+
+impl <T:TypeInt> Add for TypePair<Zero, T>{
+    type Sum = T;
+}
+impl <T:TypeInt, S:TypeInt> Add for TypePair<Succ<T>, S>
+where TypePair<T, S> : Add, <TypePair<T, S> as Add>::Sum : TypeInt,
+{
+    type Sum = <<TypePair<T, S> as Add>::Sum as TypeInt>::Next;
+}
+impl <T:TypeInt, S:TypeInt> Add for TypePair<Negative<T>, S>
+where <S as TypeInt>::Negation: TypeInt, 
+    TypePair<T, <S as TypeInt>::Negation> : Add, 
+    <TypePair<T, <S as TypeInt>::Negation>  as Add>::Sum : TypeInt,
+    <<TypePair<T, <S as TypeInt>::Negation>  as Add>::Sum  as TypeInt>::Negation : TypeInt,
+    {
+        type Sum = <<TypePair<T, <S as TypeInt>::Negation> as Add>::Sum as TypeInt>::Negation;
+    }
+
+mod artihmetic_tests {
+    use super::*;
+    type One = Succ<Zero>;
+    type Two = Succ<One>;
+    type MinusOne = Negative<One>;
+    
+    #[test]
+    fn add(){
+        assert_eq!(<TypePair<Zero, Zero> as Add>::Sum::VALUE, 0);
+        assert_eq!(<TypePair<Zero, One> as Add>::Sum::VALUE, 1);
+        assert_eq!(<TypePair<One, Zero> as Add>::Sum::VALUE, 1);
+        assert_eq!(<TypePair<One, Two> as Add>::Sum::VALUE, 3);
+        assert_eq!(<TypePair<Zero, MinusOne> as Add>::Sum::VALUE, -1);
+        assert_eq!(<TypePair<One, MinusOne> as Add>::Sum::VALUE, 0);
+        assert_eq!(<TypePair<MinusOne, Zero> as Add>::Sum::VALUE, -1);
+        assert_eq!(<TypePair<MinusOne, One> as Add>::Sum::VALUE, 0);
+        assert_eq!(<TypePair<MinusOne, MinusOne> as Add>::Sum::VALUE, -2);
     }
 }
