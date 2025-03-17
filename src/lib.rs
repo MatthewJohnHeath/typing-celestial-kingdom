@@ -39,14 +39,9 @@ mod tests {
 
 
 pub struct Zero();
+pub struct Succ<T>( PhantomData<T>);
+pub struct Negative<T>(PhantomData<T>);
 
-pub struct Succ<T>{
-    _marker: PhantomData<T>,
-}
-
-pub struct Negative<T>{
-    _marker: PhantomData<T>,
-}
 
 pub trait TypeInt{
     type Previous;
