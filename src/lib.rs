@@ -251,3 +251,19 @@ pub const fn count_different(first : &[u8], second  : &[u8])->usize{
     }
     count
 }
+#[cfg(test)]
+mod count_different_tests {
+    use super::*;
+    #[test]
+    fn runtime(){
+        let zero_to_two = [0,1,2];
+        let one_to_five = [1,2,3,4,5];
+        assert_eq!(count_different(&zero_to_two, &one_to_five), 6);
+    }
+
+    #[test]
+    fn comp_time(){
+        const SIX:usize = count_different(&[0,1,2], &[1,2,3,4,5]);
+        assert_eq!(SIX, 6);
+    }
+}
