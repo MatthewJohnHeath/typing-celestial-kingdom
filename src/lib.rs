@@ -267,3 +267,103 @@ mod count_different_tests {
         assert_eq!(SIX, 6);
     }
 }
+
+
+const fn union<const M: usize, const N: usize, const OUT: usize>( first: &[u8;N], second: &[u8;M])
+    -> [u32;Out]{
+    let mut out = [0; OUT];
+    let mut first_index = 0;
+    let mut second_index = 0;
+    let mut out_index = 0;
+    while out_index < Out{
+        if first_index ==  first.len(){ 
+            out[out_index] = second[second_index];
+            second_index += 1;
+        }
+        else if second_index ==  second.len(){
+            out[out_index] = first[first_index];
+            first_index += 1;
+        }
+        else if first[first_index] < second[second_index]{
+            out[out_index] = first[first_index];
+            first_index += 1;
+
+        }
+        else if first[first_index] > second[second_index]{
+            out[out_index] = second[second_index];
+            second_index += 1;
+        }
+        else {
+            out[out_index] = first[first_index]; 
+            first_index += 1;
+            second_index += 1;
+        }
+        out_index += 1;
+
+    }
+    out
+}
+
+pub struct MetaArray<const N:usize, const NUMS: [u8;N]> ();
+trait Arrayed{
+    const LEN: usize;
+    const ARRAY: [u8; LEN];
+}
+
+impl <const N:usize, const NUMS: [u8;N]> Arrayed for MetaArray<N, NUMS>{
+    const LEN: usize = N;
+    const ARRAY: [u8; LEN] = NUMS;
+} 
+
+impl<T: Arrayed, S:Arrayed> Arrayed for TypePair<T,S>{
+    const LEN: usize = count_different(&T::ARRAY, &S::ARRAY);
+    const ARRAY: [u8; LEN] ={
+        let mut out = [0; Self::LEN];
+        let mut first_index = 0;
+        let mut second_index = 0;
+        let mut out_index = 0;
+        while out_index < out{
+            if first_index ==  first.len(){ 
+                out[out_index] = second[second_index];
+                second_index += 1;
+            }
+            else if second_index ==  second.len(){
+                out[out_index] = first[first_index];
+                first_index += 1;
+            }
+            else if first[first_index] < second[second_index]{
+                out[out_index] = first[first_index];
+                first_index += 1;
+    
+            }
+            else if first[first_index] > second[second_index]{
+                out[out_index] = second[second_index];
+                second_index += 1;
+            }
+            else {
+                out[out_index] = first[first_index]; 
+                first_index += 1;
+                second_index += 1;
+            }
+            out_index += 1;
+    
+        }
+        out}
+    
+} 
+
+
+// #[cfg(test)]
+// mod union_tests {
+//     use super::*;
+
+//     #[test]
+//     fn comp_time(){
+
+//         const ZERO_TO_TWO: [u32; 3] = [0,1,2];
+//         const NUMBERS: [u32;count_different(&[0,1,2], &[1,2,3])] = union(&[0,1,2], &[1,2,3]); 
+        
+//         assert_eq!(NUMBERS, [0,1,2,3]);
+//     }
+// }
+ 
