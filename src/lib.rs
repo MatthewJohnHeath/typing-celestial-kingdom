@@ -167,7 +167,7 @@ where <S as TypeInt>::Negation: TypeInt,
     }
 
  #[cfg(test)]
-mod artihmetic_tests {
+mod arithmetic_tests {
     use super::*;
     type One = Succ<Zero>;
     type Two = Succ<One>;
@@ -231,4 +231,23 @@ mod choice_type_tests {
         assert!(<ChoiceType< {before("Hello", "World!")}, True, False> as Associated>::AssociatedType::VALUE);
         assert!(!<ChoiceType< {before("Bye", "Bye")}, True, False> as Associated>::AssociatedType::VALUE);        
     }
+}
+
+pub const fn count_different(first : &[u8], second  : &[u8])->usize{
+    let mut first_index = 0;
+    let mut second_index = 0;
+    let mut count = 0;
+    while first_index < first.len() || second_index < second.len(){
+        if first_index ==  first.len(){ second_index += 1;}
+        else if second_index ==  second.len(){first_index += 1;}
+        else if first[first_index] < second[second_index]{first_index += 1;}
+        else if first[first_index] > second[second_index]{second_index += 1;}
+        else { 
+            first_index += 1;
+            second_index += 1;
+        }
+
+        count += 1;
+    }
+    count
 }
