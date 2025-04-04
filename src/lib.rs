@@ -1,4 +1,9 @@
 use std::marker::PhantomData;
+
+
+//use proc_macro2::TokenStream;
+//use quote::quote;
+
 #[derive(Debug, PartialEq, Eq, Default)]
 pub struct False();
 
@@ -22,7 +27,7 @@ impl TypeBool for True {
 
 pub struct TypePair<T, S>(PhantomData<T>, PhantomData<S>);
 
-trait And {
+pub trait And {
     type BoolType: TypeBool;
 }
 
@@ -34,7 +39,7 @@ impl<T: TypeBool> And for TypePair<False, T> {
     type BoolType = False;
 }
 
-trait Or {
+pub trait Or {
     type BoolType: TypeBool;
 }
 
@@ -165,6 +170,11 @@ where
     type Sum = <<TypePair<T, <S as TypeInt>::Negation> as Add>::Sum as TypeInt>::Negation;
 }
 
+#[macro_export]
+macro_rules! type_add {
+    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Add>::Sum};
+}
+
 #[cfg(test)]
 mod arithmetic_tests {
     use super::*;
@@ -184,7 +194,16 @@ mod arithmetic_tests {
         assert_eq!(<TypePair<MinusOne, One> as Add>::Sum::VALUE, 0);
         assert_eq!(<TypePair<MinusOne, MinusOne> as Add>::Sum::VALUE, -2);
     }
+
+    #[test]
+    fn add_macro() {
+        assert_eq!(<type_add!(One, One)>::VALUE, 2);
+        assert_eq!(<type_add!(One, MinusOne)>::VALUE, 0);
+        assert_eq!(<type_add!(type_add!(One, One), One)>::VALUE, 3);
+    }
 }
+
+
 
 trait ComparisonType{}
 struct Less();
