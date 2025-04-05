@@ -312,7 +312,77 @@ where  TypePair<S,T>: Compared{
     type Comparison = <TypePair<S,T> as Compared>::Comparison;
 }
 
+#[macro_export]
+macro_rules! type_compare {
+    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Compared>::Comparison};
+}
 
+#[macro_export]
+macro_rules!  type_lt{
+    ($first:ty, $second:ty) => { <type_compare!($first, $second) as ComparisonType>::IsLess};
+}
+
+#[macro_export]
+macro_rules!  type_gt{
+    ($first:ty, $second:ty) => { type_lt!($second, $first)};
+}
+
+#[macro_export]
+macro_rules!  type_le{
+    ($first:ty, $second:ty) => { type_not!(type_gt!($first, $second))};
+}
+
+#[macro_export]
+macro_rules!  type_ge{
+    ($first:ty, $second:ty) => { type_not!(type_lt!($first, $second))};
+}
+
+#[macro_export]
+macro_rules!  type_eq{
+    ($first:ty, $second:ty) => { type_and!(type_le!($first, $second), type_ge!($first, $second))};
+}
+
+#[cfg(test)]
+mod comparison_tests {
+    use super::*;
+    type One = Succ<Zero>;
+    type MinusOne = Negative<One>;
+
+    #[test]
+    fn lt_macro() {
+        assert!(<type_lt!(Zero, One)>::VALUE);
+        assert!(!<type_lt!(Zero, Zero)>::VALUE);
+        assert!(!<type_lt!(One, MinusOne)>::VALUE);
+    }
+
+    #[test]
+    fn gt_macro() {
+        assert!(!<type_gt!(Zero, One)>::VALUE);
+        assert!(!<type_gt!(Zero, Zero)>::VALUE);
+        assert!(<type_gt!(One, MinusOne)>::VALUE);
+    }
+
+    #[test]
+    fn le_macro() {
+        assert!(<type_le!(Zero, One)>::VALUE);
+        assert!(<type_le!(Zero, Zero)>::VALUE);
+        assert!(!<type_le!(One, MinusOne)>::VALUE);
+    }
+
+    #[test]
+    fn ge_macro() {
+        assert!(!<type_ge!(Zero, One)>::VALUE);
+        assert!(<type_ge!(Zero, Zero)>::VALUE);
+        assert!(<type_ge!(One, MinusOne)>::VALUE);
+    }
+
+    #[test]
+    fn eq_macro() {
+        assert!(!<type_eq!(Zero, One)>::VALUE);
+        assert!(<type_eq!(Zero, Zero)>::VALUE);
+        assert!(!<type_eq!(One, MinusOne)>::VALUE);
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
