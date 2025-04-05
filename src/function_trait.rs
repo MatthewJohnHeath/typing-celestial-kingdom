@@ -9,19 +9,34 @@ pub mod function_traits{
         ($function_trait:tt, $param:ty) => { <$param as $function_trait>::Type};
     }
 
+    #[macro_export]
+    macro_rules! declare_function_trait {
+        {$trait_name:tt} => {        
+            trait $trait_name{
+            type Type;
+           }};
+    }
+
+     #[macro_export]
+    macro_rules! impl_function_trait {
+        {
+            $trait_name:tt
+            {$in:ty => $out:ty}
+        } => {
+                impl $trait_name for $in{
+                type Type = $out;
+                }
+            };
+    }  
+
 
     #[cfg(test)]
     mod tests {
        struct Foo();
        struct Bar();
        
-       trait Barred{
-        type Type;
-       }
-       
-       impl Barred for Foo{
-        type Type = Bar;
-       }
+       declare_function_trait!{Barred}
+       impl_function_trait!(Barred {Foo => Bar});
        trait Truthy{
         const VALUE : bool;
        }
