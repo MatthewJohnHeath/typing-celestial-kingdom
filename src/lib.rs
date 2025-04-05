@@ -1,3 +1,5 @@
+mod function_trait;
+
 use std::marker::PhantomData;
 
 
