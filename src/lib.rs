@@ -51,6 +51,47 @@ impl<T: TypeBool> Or for TypePair<False, T> {
     type BoolType = T;
 }
 
+pub trait Same {
+    type BoolType: TypeBool;
+}
+
+impl Same for TypePair<False, False> {
+    type BoolType = False;
+}
+
+impl Same for TypePair<True, True> {
+    type BoolType = True;
+}
+
+impl Same for TypePair<True, False> {
+    type BoolType = False;
+}
+
+impl Same for TypePair<False, True> {
+    type BoolType = False;
+}
+
+#[macro_export]
+macro_rules! type_not {
+    ($bool_t:ty) => { <$bool_t as TypeBool>::Not};
+}
+
+#[macro_export]
+macro_rules! type_and {
+    ($first:ty, $second:ty) => { <TypePair<$first, $second> as And>::BoolType};
+}
+
+#[macro_export]
+macro_rules! type_or {
+    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Or>::BoolType};
+}
+
+#[macro_export]
+macro_rules! type_bool_eq {
+    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Equal>::BoolType};
+}
+
+
 #[cfg(test)]
 mod logic_tests {
     use super::*;
@@ -203,9 +244,8 @@ mod arithmetic_tests {
     }
 }
 
-
-
-trait ComparisonType{}
+trait ComparisonType
+}
 struct Less();
 impl ComparisonType for Less{}
 struct Equal();
