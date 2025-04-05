@@ -244,8 +244,7 @@ mod arithmetic_tests {
     }
 }
 
-trait ComparisonType
-}
+trait ComparisonType{}
 struct Less();
 impl ComparisonType for Less{}
 struct Equal();
