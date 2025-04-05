@@ -244,13 +244,30 @@ mod arithmetic_tests {
     }
 }
 
-trait ComparisonType{}
+trait ComparisonType{
+    type IsLess;
+    type IsEqual;
+    type IsMore;
+}
 struct Less();
-impl ComparisonType for Less{}
+impl ComparisonType for Less{
+    type IsLess = True;
+    type IsEqual = False;
+    type IsMore = False;
+}
 struct Equal();
-impl ComparisonType for Equal{}
+impl ComparisonType for Equal{
+    type IsLess = False;
+    type IsEqual = True;
+    type IsMore = False;
+
+}
 struct More();
-impl ComparisonType for More{}
+impl ComparisonType for More{
+    type IsLess = False;
+    type IsEqual = False;
+    type IsMore = True;
+}
 
 trait Compared{
     type Comparison: ComparisonType;
@@ -294,6 +311,8 @@ impl<T, S> Compared for TypePair<Negative<T>, Negative<S>>
 where  TypePair<S,T>: Compared{
     type Comparison = <TypePair<S,T> as Compared>::Comparison;
 }
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
