@@ -1,4 +1,4 @@
-mod function_trait;
+pub mod function_trait;
 
 use std::marker::PhantomData;
 
