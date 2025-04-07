@@ -214,9 +214,20 @@ where
 }
 
 #[macro_export]
+macro_rules! type_neg {
+    ($num:ty) => { <$num as TypeInt>::Negation};
+}
+
+#[macro_export]
 macro_rules! type_add {
     ($first:ty, $second:ty) => { <TypePair<$first, $second> as Add>::Sum};
 }
+
+#[macro_export]
+macro_rules! type_sub {
+    ($first:ty, $second:ty) => {type_add!($first, type_neg!($second))};
+}
+
 
 #[cfg(test)]
 mod arithmetic_tests {
@@ -239,10 +250,24 @@ mod arithmetic_tests {
     }
 
     #[test]
+    fn neg_macro() {
+        assert_eq!(<type_neg!(Two)>::VALUE, -2);
+        assert_eq!(<type_neg!(Zero)>::VALUE, 0);
+        assert_eq!(<type_neg!(MinusOne)>::VALUE, 1);
+    }
+
+    #[test]
     fn add_macro() {
         assert_eq!(<type_add!(One, One)>::VALUE, 2);
         assert_eq!(<type_add!(One, MinusOne)>::VALUE, 0);
         assert_eq!(<type_add!(type_add!(One, One), One)>::VALUE, 3);
+    }
+
+    #[test]
+    fn sub_macro() {
+        assert_eq!(<type_sub!(One, One)>::VALUE, 0);
+        assert_eq!(<type_sub!(One, MinusOne)>::VALUE, 2);
+        assert_eq!(<type_sub!(One, type_sub!(One, One))>::VALUE, 1);
     }
 }
 
