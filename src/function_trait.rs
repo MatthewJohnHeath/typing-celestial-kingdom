@@ -39,11 +39,26 @@ pub mod function_traits{
                 type Type = $out;
                 }
             };
-    }  
+    }
 
+    pub trait Valued<T> {
+        type ValueType;
+        const VALUE:T;
+    }
+    #[macro_export]
+    macro_rules! assign_value {
+        { $type:ty, $val_type:ty, $val:expr
+        } => {
+                impl Valued<$val_type>for $type{
+                type ValueType = $val_type;
+                const VALUE: $val_type = $val;
+                }
+            };
+    }
 
     #[cfg(test)]
     mod tests {
+        use super::*;
        struct Foo();
        struct Bar();
        
@@ -51,13 +66,9 @@ pub mod function_traits{
        impl_function_trait!(Barred {Foo => Bar});
 
        impl_function_trait!(Barred {(Foo, Bar) => Bar});
-       trait Truthy{
-        const VALUE : bool;
-       }
 
-       impl Truthy for Bar {
-           const VALUE : bool = true;
-       }
+       assign_value!(Bar, bool, true);
+
 
        #[test]
        fn apply() {
