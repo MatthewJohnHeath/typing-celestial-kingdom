@@ -7,7 +7,7 @@ pub struct Cons<T, S>(PhantomData<T>, PhantomData<S>);
 macro_rules! type_list{
         () => {()};
         ($type:ty) => {$type};
-        ({$head:ty, $($tail:tt)+}) => {Cons<$head, type_list!($($tail)+)>};
+        ({$head:ty, $($tail:tt)+}) => {crate::function_trait::Cons<$head, type_list!($($tail)+)>};
     }
 
 
