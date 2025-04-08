@@ -64,7 +64,7 @@ pub trait Valued<T> {
 macro_rules! assign_value {
         { $type:ty, $val_type:ty, $val:expr
         } => {
-                impl Valued<$val_type>for $type{
+                impl crate::function_trait::Valued<$val_type>for $type{
                 type ValueType = $val_type;
                 const VALUE: $val_type = $val;
                 }

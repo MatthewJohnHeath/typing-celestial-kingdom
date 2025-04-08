@@ -1,5 +1,6 @@
 #![no_std]
 pub mod function_trait;
+pub mod bool;
 use core::marker::PhantomData;
 
 //use proc_macro2::TokenStream;
