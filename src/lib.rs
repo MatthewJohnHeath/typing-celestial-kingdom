@@ -1,6 +1,6 @@
+#![no_std]
 pub mod function_trait;
-
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 //use proc_macro2::TokenStream;
 //use quote::quote;

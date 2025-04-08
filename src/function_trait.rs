@@ -1,5 +1,5 @@
 
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 pub struct Cons<T, S>(PhantomData<T>, PhantomData<S>);
 
