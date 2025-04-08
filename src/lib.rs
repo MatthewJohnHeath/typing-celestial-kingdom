@@ -2,7 +2,6 @@ pub mod function_trait;
 
 use std::marker::PhantomData;
 
-
 //use proc_macro2::TokenStream;
 //use quote::quote;
 
@@ -75,24 +74,31 @@ impl Same for TypePair<False, True> {
 
 #[macro_export]
 macro_rules! type_not {
-    ($bool_t:ty) => { <$bool_t as TypeBool>::Not};
+    ($bool_t:ty) => {
+        <$bool_t as TypeBool>::Not
+    };
 }
 
 #[macro_export]
 macro_rules! type_and {
-    ($first:ty, $second:ty) => { <TypePair<$first, $second> as And>::BoolType};
+    ($first:ty, $second:ty) => {
+        <TypePair<$first, $second> as And>::BoolType
+    };
 }
 
 #[macro_export]
 macro_rules! type_or {
-    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Or>::BoolType};
+    ($first:ty, $second:ty) => {
+        <TypePair<$first, $second> as Or>::BoolType
+    };
 }
 
 #[macro_export]
 macro_rules! type_bool_eq {
-    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Equal>::BoolType};
+    ($first:ty, $second:ty) => {
+        <TypePair<$first, $second> as Equal>::BoolType
+    };
 }
-
 
 #[cfg(test)]
 mod logic_tests {
@@ -215,19 +221,24 @@ where
 
 #[macro_export]
 macro_rules! type_neg {
-    ($num:ty) => { <$num as TypeInt>::Negation};
+    ($num:ty) => {
+        <$num as TypeInt>::Negation
+    };
 }
 
 #[macro_export]
 macro_rules! type_add {
-    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Add>::Sum};
+    ($first:ty, $second:ty) => {
+        <TypePair<$first, $second> as Add>::Sum
+    };
 }
 
 #[macro_export]
 macro_rules! type_sub {
-    ($first:ty, $second:ty) => {type_add!($first, type_neg!($second))};
+    ($first:ty, $second:ty) => {
+        type_add!($first, type_neg!($second))
+    };
 }
-
 
 #[cfg(test)]
 mod arithmetic_tests {
@@ -271,102 +282,115 @@ mod arithmetic_tests {
     }
 }
 
-trait ComparisonType{
+trait ComparisonType {
     type IsLess;
     type IsEqual;
     type IsMore;
 }
 struct Less();
-impl ComparisonType for Less{
+impl ComparisonType for Less {
     type IsLess = True;
     type IsEqual = False;
     type IsMore = False;
 }
 struct Equal();
-impl ComparisonType for Equal{
+impl ComparisonType for Equal {
     type IsLess = False;
     type IsEqual = True;
     type IsMore = False;
-
 }
 struct More();
-impl ComparisonType for More{
+impl ComparisonType for More {
     type IsLess = False;
     type IsEqual = False;
     type IsMore = True;
 }
 
-trait Compared{
+trait Compared {
     type Comparison: ComparisonType;
 }
 
-impl<T> Compared for TypePair<Succ<T>, Zero>{
+impl<T> Compared for TypePair<Succ<T>, Zero> {
     type Comparison = More;
 }
-impl<T, S> Compared for TypePair<Succ<T>, Negative<S>>{
+impl<T, S> Compared for TypePair<Succ<T>, Negative<S>> {
     type Comparison = More;
 }
 
 impl<T, S> Compared for TypePair<Succ<T>, Succ<S>>
-where TypePair<T,S>: Compared{
-    type Comparison = <TypePair<T,S> as Compared>::Comparison;
+where
+    TypePair<T, S>: Compared,
+{
+    type Comparison = <TypePair<T, S> as Compared>::Comparison;
 }
 
-impl<T> Compared for TypePair<Zero, Succ<T>>{
+impl<T> Compared for TypePair<Zero, Succ<T>> {
     type Comparison = Less;
 }
 
-impl Compared for TypePair<Zero, Zero>{
+impl Compared for TypePair<Zero, Zero> {
     type Comparison = Equal;
 }
 
-impl<T> Compared for TypePair<Zero, Negative<T>>{
+impl<T> Compared for TypePair<Zero, Negative<T>> {
     type Comparison = More;
 }
 
-impl<T, S> Compared for TypePair<Negative<T>, Succ<S>>
-{
+impl<T, S> Compared for TypePair<Negative<T>, Succ<S>> {
     type Comparison = Less;
 }
 
-impl<T> Compared for TypePair<Negative<T>, Zero>
-{
+impl<T> Compared for TypePair<Negative<T>, Zero> {
     type Comparison = Less;
 }
 
 impl<T, S> Compared for TypePair<Negative<T>, Negative<S>>
-where  TypePair<S,T>: Compared{
-    type Comparison = <TypePair<S,T> as Compared>::Comparison;
+where
+    TypePair<S, T>: Compared,
+{
+    type Comparison = <TypePair<S, T> as Compared>::Comparison;
 }
 
 #[macro_export]
 macro_rules! type_compare {
-    ($first:ty, $second:ty) => { <TypePair<$first, $second> as Compared>::Comparison};
+    ($first:ty, $second:ty) => {
+        <TypePair<$first, $second> as Compared>::Comparison
+    };
 }
 
 #[macro_export]
-macro_rules!  type_lt{
-    ($first:ty, $second:ty) => { <type_compare!($first, $second) as ComparisonType>::IsLess};
+macro_rules! type_lt {
+    ($first:ty, $second:ty) => {
+        <type_compare!($first, $second) as ComparisonType>::IsLess
+    };
 }
 
 #[macro_export]
-macro_rules!  type_gt{
-    ($first:ty, $second:ty) => { type_lt!($second, $first)};
+macro_rules! type_gt {
+    ($first:ty, $second:ty) => {
+        type_lt!($second, $first)
+    };
 }
 
 #[macro_export]
-macro_rules!  type_le{
-    ($first:ty, $second:ty) => { type_not!(type_gt!($first, $second))};
+macro_rules! type_le {
+    ($first:ty, $second:ty) => {
+        type_not!(type_gt!($first, $second))
+    };
 }
 
 #[macro_export]
-macro_rules!  type_ge{
-    ($first:ty, $second:ty) => { type_not!(type_lt!($first, $second))};
+macro_rules! type_ge {
+    ($first:ty, $second:ty) => {
+        type_not!(type_lt!($first, $second))
+    };
 }
 
 #[macro_export]
-macro_rules!  type_eq{
-    ($first:ty, $second:ty) => { type_and!(type_le!($first, $second), type_ge!($first, $second))};
+macro_rules! type_eq {
+    ($first:ty, $second:ty) => {
+        type_and!(type_le!($first, $second), type_ge!($first, $second))
+    };
 }
 
 #[cfg(test)]

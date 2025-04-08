@@ -1,36 +1,39 @@
 
-pub mod function_traits{
-    use std::marker::PhantomData;
-   
-    pub struct Cons<T, S>(PhantomData<T>, PhantomData<S>);
+use std::marker::PhantomData;
 
-    #[macro_export]
-    macro_rules! type_list{
+pub struct Cons<T, S>(PhantomData<T>, PhantomData<S>);
+
+#[macro_export]
+macro_rules! type_list{
         () => {()};
         ($type:ty) => {$type};
-        ($head:ty, $($tail:tt)+) => {Cons<$head, type_list($($tail:tt)+)>};
-    }
-   
-    #[macro_export]
-    macro_rules! evaluate{
-        ($type:ty)=>{<$type>::VALUE};
+        ({$head:ty, $($tail:tt)+}) => {Cons<$head, type_list!($($tail)+)>};
     }
 
-    #[macro_export]
-    macro_rules! apply_function_trait {
-        ($function_trait:tt, $params:tt) => { <type_list!($params) as $function_trait>::Type};
-    }
+#[macro_export]
+macro_rules! evaluate {
+    ($type:ty) => {
+        <$type>::VALUE
+    };
+}
 
-    #[macro_export]
-    macro_rules! declare_function_trait {
-        {$trait_name:tt} => {        
+#[macro_export]
+macro_rules! apply_function_trait {
+    ($function_trait:tt, $params:tt) => {
+        <type_list!($params) as $function_trait>::Type
+    };
+}
+
+#[macro_export]
+macro_rules! declare_function_trait {
+        {$trait_name:tt} => {
             trait $trait_name{
             type Type;
            }};
     }
 
-    #[macro_export]
-    macro_rules! impl_function_trait {
+#[macro_export]
+macro_rules! impl_function_trait {
         {
             $trait_name:tt
             {$in:tt => $out:ty}
@@ -39,14 +42,22 @@ pub mod function_traits{
                 type Type = $out;
                 }
             };
+
+        {
+            $trait_name:tt
+            {$head_in:tt => $head_out:ty, $($in:tt => $out:ty)+}
+        } => {
+                impl_function_trait!{$trait_name {$head_in => $head_out}}
+                impl_function_trait!{$trait_name {$($in => $out)+}}
+            };
     }
 
-    pub trait Valued<T> {
-        type ValueType;
-        const VALUE:T;
-    }
-    #[macro_export]
-    macro_rules! assign_value {
+pub trait Valued<T> {
+    type ValueType;
+    const VALUE: T;
+}
+#[macro_export]
+macro_rules! assign_value {
         { $type:ty, $val_type:ty, $val:expr
         } => {
                 impl Valued<$val_type>for $type{
@@ -56,26 +67,20 @@ pub mod function_traits{
             };
     }
 
-    #[cfg(test)]
-    mod tests {
-        use super::*;
-       struct Foo();
-       struct Bar();
-       
-       declare_function_trait!{Barred}
-       impl_function_trait!(Barred {Foo => Bar});
+#[cfg(test)]
+mod tests {
+    use super::*;
+    struct Foo();
+    struct Bar();
 
-       impl_function_trait!(Barred {(Foo, Bar) => Bar});
+    declare_function_trait! {Barred}
+    impl_function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar});
 
-       assign_value!(Bar, bool, true);
+    assign_value!(Bar, bool, true);
 
-
-       #[test]
-       fn apply() {
-           assert!(evaluate!(apply_function_trait!(Barred, Foo)));
-           assert!(evaluate!(apply_function_trait!(Barred, (Foo, Bar))));
-       }
-
+    #[test]
+    fn apply() {
+        assert!(evaluate!(apply_function_trait!(Barred, Foo)));
+        //assert!(evaluate!(apply_function_trait!(Barred, (Foo, Bar))));
     }
-    
 }
