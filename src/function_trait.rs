@@ -40,10 +40,10 @@ macro_rules! impl_function_trait {
 
         {
             $trait_name:tt
-            {$head_in:tt => $head_out:ty, $($in:tt => $out:ty)+}
+            {$head_in:tt => $head_out:ty, $($in:tt => $out:ty),+}
         } => {
                 impl_function_trait!{$trait_name {$head_in => $head_out}}
-                impl_function_trait!{$trait_name {$($in => $out)+}}
+                impl_function_trait!{$trait_name {$($in => $out),+}}
             };
     }
 
@@ -83,7 +83,7 @@ mod tests {
     struct Foo();
     struct Bar();
 
-    function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar});
+    function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar, Bar => Bar});
 
     assign_value!(Bar, bool, true);
 
