@@ -52,6 +52,16 @@ macro_rules! impl_function_trait {
             };
     }
 
+
+#[macro_export]
+macro_rules! function_trait {
+    {$trait_name:tt $rest:tt}=>{
+        declare_function_trait!{$trait_name}
+        impl_function_trait!{$trait_name $rest}
+        }
+
+}
+
 pub trait Valued<T> {
     type ValueType;
     const VALUE: T;
@@ -73,14 +83,13 @@ mod tests {
     struct Foo();
     struct Bar();
 
-    declare_function_trait! {Barred}
-    impl_function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar});
+    function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar});
 
     assign_value!(Bar, bool, true);
 
     #[test]
     fn apply() {
         assert!(evaluate!(apply_function_trait!(Barred, Foo)));
-        //assert!(evaluate!(apply_function_trait!(Barred, (Foo, Bar))));
+        assert!(evaluate!(apply_function_trait!(Barred, {Foo, Bar})));
     }
 }
