@@ -10,12 +10,7 @@ macro_rules! type_list{
         ({$head:ty, $($tail:tt)+}) => {Cons<$head, type_list!($($tail)+)>};
     }
 
-#[macro_export]
-macro_rules! evaluate {
-    ($type:ty) => {
-        <$type>::VALUE
-    };
-}
+
 
 #[macro_export]
 macro_rules! apply_function_trait {
@@ -59,7 +54,6 @@ macro_rules! function_trait {
         declare_function_trait!{$trait_name}
         impl_function_trait!{$trait_name $rest}
         }
-
 }
 
 pub trait Valued<T> {
@@ -75,7 +69,13 @@ macro_rules! assign_value {
                 const VALUE: $val_type = $val;
                 }
             };
-    }
+}
+#[macro_export]
+macro_rules! evaluate {
+    ($type:ty) => {
+        <$type>::VALUE
+    };
+}
 
 #[cfg(test)]
 mod tests {
