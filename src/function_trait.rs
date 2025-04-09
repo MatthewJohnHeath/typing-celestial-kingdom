@@ -6,18 +6,16 @@ pub struct Cons<T, S>(PhantomData<T>, PhantomData<S>);
 #[macro_export]
 macro_rules! type_list{
         () => {()};
-        ($type:ty) => {$type};
-        ({$head:ty, $($tail:tt)+}) => {crate::function_trait::Cons<$head, type_list!($($tail)+)>};
+        ($type:tt) => {$type};
+        ({$head:tt $($tail:tt)+}) => {crate::function_trait::Cons<$head, type_list!{$($tail)+}>};
     }
 
-
-
 #[macro_export]
-macro_rules! apply_function_trait {
-    ($function_trait:tt, $params:tt) => {
-        <type_list!($params) as $function_trait>::Type
-    };
-}
+macro_rules! call_trait {
+        ($function_trait:tt, $params:tt) => {
+            <type_list!($params) as $function_trait>::Type
+        };
+    }
 
 #[macro_export]
 macro_rules! declare_function_trait {
@@ -46,7 +44,6 @@ macro_rules! impl_function_trait {
                 impl_function_trait!{$trait_name {$($in => $out),+}}
             };
     }
-
 
 #[macro_export]
 macro_rules! function_trait {
@@ -83,13 +80,13 @@ mod tests {
     struct Foo();
     struct Bar();
 
-    function_trait!(Barred {Foo => Bar, {Foo, Bar} => Bar, Bar => Bar});
+    function_trait!(Barred {Foo => Bar, {Foo Bar i64} => Bar, Bar => Bar});
 
     assign_value!(Bar, bool, true);
 
     #[test]
     fn apply() {
-        assert!(evaluate!(apply_function_trait!(Barred, Foo)));
-        assert!(evaluate!(apply_function_trait!(Barred, {Foo, Bar})));
+        assert!(evaluate!(call_trait!(Barred, Foo)));
+        assert!(evaluate!(call_trait!(Barred, {Foo Bar i64})));
     }
 }
